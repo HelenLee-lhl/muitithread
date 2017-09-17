@@ -101,4 +101,64 @@ public class SynchronizedDemo {
   1）updataD()和updataE()效果同updataB()和updataC()<br>
   2）那么updataC()和updataD()同步互斥吗？当然不是，两个方法同步的作用域不同，即两个线程可以拿到不同作用域的钥匙进行操纵。<br>
   
+### 示例 3 死锁问题
+```Java
+package com.helen.muitithread;
+
+import java.util.Date;
+
+/**
+ * Created by helenlee on 2017/9/17.
+ */
+public class DeadLockDemo implements Runnable{
+    private ObjectA objectA = new ObjectA();
+    private ObjectB objectB = new ObjectB();
+
+    @Override
+    public void run() {
+        for (int i = 0 ; i < 50 ; i ++){
+            if ("a".equals(Thread.currentThread().getName())){
+                objectA.methodA();
+            }else {
+                objectB.methodB();
+            }
+        }
+    }
+    class ObjectA{
+        public synchronized void methodA(){
+            try {
+                Thread.sleep(1000);
+                System.out.println("线程" + Thread.currentThread().getName() + "进入methodA()方法,马上开始执行methodB()方法" + new Date());
+                objectB.methodB();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    class ObjectB{
+        public synchronized void methodB(){
+            try {
+                System.out.println("线程" + Thread.currentThread().getName() + "进入methodB()方法,马上开始执行methodA()方法" + new Date());
+                objectA.methodA();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public static void main(String [] agrs){
+        DeadLockDemo deadLockDemo = new DeadLockDemo();
+        Thread a = new Thread(deadLockDemo);
+        Thread b = new Thread(deadLockDemo);
+        a.setName("a");
+        b.setName("b");
+        a.start();
+        b.start();
+    }
+}
+```
+打印结果：
+线程b进入methodB()方法,马上开始执行methodA()方法Sun Sep 17 17:09:29 CST 2017
+线程a进入methodA()方法,马上开始执行methodB()方法Sun Sep 17 17:09:30 CST 2017
+无尽的等待中..........
+　`产生原因：线程 a 拿到objectA对象锁钥匙把持住不放并尝试对ObjectB进行调用发现ObjectB其他线程锁住于是进入等待状态，而线程 b拿到了ObjectB对象锁钥匙，并尝试对objectA进行调用发现objectA其他线程锁住于是进入等待状态。线程a／b 各自把持对象锁不放，于是死锁产生`
   
