@@ -156,9 +156,9 @@ public class DeadLockDemo implements Runnable{
     }
 }
 ```
-打印结果：
-线程b进入methodB()方法,马上开始执行methodA()方法Sun Sep 17 17:09:29 CST 2017
-线程a进入methodA()方法,马上开始执行methodB()方法Sun Sep 17 17:09:30 CST 2017
+打印结果：<br>
+线程b进入methodB()方法,马上开始执行methodA()方法Sun Sep 17 17:09:29 CST 2017<br>
+线程a进入methodA()方法,马上开始执行methodB()方法Sun Sep 17 17:09:30 CST 2017<br>
 无尽的等待中..........
 　`产生原因：线程 a 拿到objectA对象锁钥匙把持住不放并尝试对ObjectB进行调用发现ObjectB其他线程锁住于是进入等待状态，而线程 b拿到了ObjectB对象锁钥匙，并尝试对objectA进行调用发现objectA其他线程锁住于是进入等待状态。线程a／b 各自把持对象锁不放，于是死锁产生`
   
